@@ -3,8 +3,7 @@
     let tskstime = [];
     let reversedtsks = [];
     let reversedtskstime = [];
-  //  let tskshelp = [];
-  //  let tskstimehelp = [];
+
 
     //проверка при запуске
    if (confirm('Восстановить последние сохраненные данные?')){
@@ -25,6 +24,11 @@
    //обработчик кнопки ДОБАВИТЬ
     document.getElementById('add').onclick = function (){
 
+         if (document.getElementById('input').value == '') {
+             alert('Вы не ввели задачу.');
+             return;
+         }
+
          let arrhelp1 = {};
          arrhelp1.task = document.getElementById('input').value;
          arrhelp1.priority = document.getElementById('slt').value;
@@ -39,6 +43,7 @@
 
 
          out();
+        document.getElementById('input').value = '';
 
          localStorage.setItem('tasks', JSON.stringify(tsks));
          localStorage.setItem('taskst', JSON.stringify(tskstime));
@@ -74,8 +79,6 @@
             out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
 
-
-
             out+= tskstime[param].dateandtime + '<br>';
         }
 
@@ -86,9 +89,7 @@
     //фильтр по приоритетам
     document.getElementById('filter').onclick = function (){
 
-       // document.getElementById('filterDate').onclick;
-
-        let outh = '';
+        let out = '';
 
       if (document.getElementById('high').checked) {
           for (let param in tsks) {
@@ -98,18 +99,18 @@
            //       tskstimehelp[param] = tskstime[param];
 
 
-                  outh += 'Высокий приоритет: ';
-                  outh += tsks[param].task;
+                  out += 'Высокий приоритет: ';
+                  out += tsks[param].task;
 
 
                   let okid = 'ok' + param;
                   let noid = 'no' + param;
                   let delid = 'del' + param;
 
-                  outh += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+                  out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
 
-                  outh += tskstime[param].dateandtime + '<br>';
+                  out += tskstime[param].dateandtime + '<br>';
               }
           }
       }
@@ -122,19 +123,17 @@
            //       tskstimehelp[param] = tskstime[param];
 
 
-                  outh += 'Обычный приоритет: ';
-                  outh += tsks[param].task;
+                  out += 'Обычный приоритет: ';
+                  out += tsks[param].task;
 
                   let okid = 'ok' + param;
                   let noid = 'no' + param;
                   let delid = 'del' + param;
 
-                  outh += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+                  out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
 
-
-                  //outh += '   ' + '<button id="confirm"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="cancel"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="deletetask"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
-                  outh += tskstime[param].dateandtime + '<br>';
+                  out += tskstime[param].dateandtime + '<br>';
               }
           }
       }
@@ -143,24 +142,16 @@
             for (let param in tsks) {
                 if (tsks[param].priority === 'low') {
 
-             //       tskshelp[param] = tsks[param];
-             //       tskstimehelp[param] = tskstime[param];
-
-
-                    outh += 'Низкий приоритет: ';
-                    outh += tsks[param].task;
+                    out += 'Низкий приоритет: ';
+                    out += tsks[param].task;
 
                     let okid = 'ok' + param;
                     let noid = 'no' + param;
                     let delid = 'del' + param;
 
-                    outh += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+                    out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
-
-
-                    //outh += '   ' + '<button id="confirm"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="cancel"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="deletetask"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
-
-                    outh += tskstime[param].dateandtime + '<br>';
+                    out += tskstime[param].dateandtime + '<br>';
                 }
             }
         }
@@ -168,39 +159,36 @@
         if (!(document.getElementById('high').checked) && !(document.getElementById('normal').checked) && !(document.getElementById('low').checked)) {
             for (let param in tsks){
 
-          //     tskshelp[param] = tsks[param];
-          //      tskstimehelp[param] = tskstime[param];
-
 
                 switch(tsks[param].priority) {
                     case 'high':
-                        outh += 'Высокий приоритет: ';
+                        out += 'Высокий приоритет: ';
                         break;
 
                     case 'normal':
-                        outh += 'Обычный приоритет: ';
+                        out += 'Обычный приоритет: ';
                         break;
 
                     case 'low':
-                        outh += 'Низкий приоритет: ';
+                        out += 'Низкий приоритет: ';
                         break;
                     default:
                         break;
                 }
 
-                outh += tsks[param].task;
+                out += tsks[param].task;
 
                 let okid = 'ok' + param;
                 let noid = 'no' + param;
                 let delid = 'del' + param;
 
-                outh += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+                out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
-                outh+= tskstime[param].dateandtime + '<br>';
+                out+= tskstime[param].dateandtime + '<br>';
             }
             }
 
-        document.getElementById('out').innerHTML = outh;
+        document.getElementById('out').innerHTML = out;
     };
 
 
@@ -230,14 +218,15 @@
 
             out += reversedtsks[param].task;
 
+
+//id не задаются, я потом не могу найти элементы для удаления или изменения состояния
             let okid = 'ok' + param;
             let noid = 'no' + param;
             let delid = 'del' + param;
 
+            alert(delid);
+
             out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
-
-
-            // out += '   ' + '<button id="confirm"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="cancel"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="deletetask"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
             out += reversedtskstime[param].dateandtime + '<br>';
         }
@@ -246,10 +235,18 @@
     };
 
 
-   //удаление
-   //бред сивой кобылы
-   //  while(1) {
-   //  for (let param in tsks){
-   //     if ()
-   //   }
-   //  }
+    /*удаление
+    for(let param in tsks) {
+        let anyid = 'del' + param;
+        document.getElementById('anyid').onclick = function () {
+            tsks.splice(param, 1);
+            out();
+        }
+    }*/
+
+    //пытаюсь посмотреть id элемента
+    document.body.onclick = function(e) {
+       let elem = e.target;
+       let id = elem.id;
+       alert(id);
+    }
