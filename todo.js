@@ -8,7 +8,7 @@
     //проверка при запуске
    if (confirm('Восстановить последние сохраненные данные?')){
        // todo при проверке на undefined лучше использовать typeof (через typeof всегда выдает true)
-        if (localStorage.getItem('tasks') != undefined){
+        if (typeof localStorage.getItem('tasks') !== 'undefined'){
            tsks =  JSON.parse(localStorage.getItem('tasks'));
            tskstime =  JSON.parse(localStorage.getItem('taskst'));
             out();
@@ -24,7 +24,7 @@
    //обработчик кнопки ДОБАВИТЬ
     document.getElementById('add').onclick = function (){
 
-         if (document.getElementById('input').value == '') {
+         if (document.getElementById('input').value === '') {
              alert('Вы не ввели задачу.');
              return;
          }
@@ -49,9 +49,23 @@
          localStorage.setItem('taskst', JSON.stringify(tskstime));
     };
 
+   function saveSomeShit() {
+       console.log(id);
+   }
    //функция вывода
     function out(){
         let out = '';
+       /* let element = document.getElementById('out');
+        let someDiv = document.createElement('div');
+        let button = document.createElement('button');
+        button.innerHTML = 'Save';
+        button.addEventListener('click', saveSomeShit);
+        someDiv.innerHTML = 'sosi';
+        someDiv.id = '1';
+        someDiv.appendChild(button);
+        element.appendChild(someDiv);
+        console.log('element', element);*/
+       /* console.log('element', element);*/
         for (let param in tsks){
             switch(tsks[param].priority) {
                 case 'high':
@@ -76,10 +90,11 @@
             let noid = 'no' + param;
             let delid = 'del' + param;
 
-            out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+            out += '   ' + '<button id="okid"><img alt="текст" src="./images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
 
             out+= tskstime[param].dateandtime + '<br>';
+            console.log('out', out);
         }
 
        document.getElementById('out').innerHTML = out;
@@ -107,7 +122,7 @@
                   let noid = 'no' + param;
                   let delid = 'del' + param;
 
-                  out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+                  out += '   ' + '<button id="okid"><img alt="текст" src="./images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
 
                   out += tskstime[param].dateandtime + '<br>';
@@ -130,7 +145,7 @@
                   let noid = 'no' + param;
                   let delid = 'del' + param;
 
-                  out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+                  out += '   ' + '<button id="okid"><img alt="текст" src="./images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
 
                   out += tskstime[param].dateandtime + '<br>';
@@ -149,7 +164,7 @@
                     let noid = 'no' + param;
                     let delid = 'del' + param;
 
-                    out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+                    out += '   ' + '<button id="okid"><img alt="текст" src="./images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
                     out += tskstime[param].dateandtime + '<br>';
                 }
@@ -182,7 +197,7 @@
                 let noid = 'no' + param;
                 let delid = 'del' + param;
 
-                out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+                out += '   ' + '<button id="okid"><img alt="текст" src="./images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
                 out+= tskstime[param].dateandtime + '<br>';
             }
@@ -226,7 +241,7 @@
 
             alert(delid);
 
-            out += '   ' + '<button id="okid"><img src="images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
+            out += '   ' + '<button id="okid"><img alt="текст" src="./images/ok.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="noid"><img src="images/no.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<button id="delid"><img src="images/del.svg" width="15" height="15" style="vertical-align: middle"></button>' + '<br>';
 
             out += reversedtskstime[param].dateandtime + '<br>';
         }
@@ -248,5 +263,5 @@
     document.body.onclick = function(e) {
        let elem = e.target;
        let id = elem.id;
-       alert(id);
-    }
+     //  alert(id);
+    };
