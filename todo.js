@@ -1,15 +1,17 @@
 let tsks = [];
 let tskstime = [];
 let tsksid = [];
+let tsksstat = [];
 
 if (confirm('Восстановить последние сохраненные данные?')){
     if (!(localStorage.getItem('tasks') === null)){
         tsks =  JSON.parse(localStorage.getItem('tasks'));
         tskstime =  JSON.parse(localStorage.getItem('taskst'));
-        tsksid =  JSON.parse(localStorage.getItem('taski'));
+        tsksid =  JSON.parse(localStorage.getItem('tasksi'));
+        tsksstat = JSON.parse(localStorage.getItem('taskstat'));
 
-        for(let param in tsks){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid);
+        for(let param in tsks) {
+            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus);
         }
     }
     else {
@@ -42,47 +44,98 @@ document.getElementById('add').onclick = function (){
     arrhelp3.taskid = tsks.length-1;
     tsksid[tsksid.length] = arrhelp3;
 
+    let arrhelp4 = {};
+    arrhelp4.task = document.getElementById('input').value;
+    arrhelp4.taskstatus = false;
+    tsksstat[tsksstat.length] = arrhelp4;
+
     document.getElementById('input').value = '';
 
     localStorage.setItem('tasks', JSON.stringify(tsks));
     localStorage.setItem('taskst', JSON.stringify(tskstime));
     localStorage.setItem('tasksi', JSON.stringify(tsksid));
+    localStorage.setItem('taskstat', JSON.stringify(tsksstat));
 
-    out(tsks[tsks.length-1].task, tsks[tsks.length-1].priority, tskstime[tskstime.length-1].dateandtime,tsksid[tsksid.length-1].taskid);
+    out(tsks[tsks.length-1].task, tsks[tsks.length-1].priority, tskstime[tskstime.length-1].dateandtime,tsksid[tsksid.length-1].taskid, tsksstat[tsksstat.length-1].taskstatus);
 }
 
-function out(task, priority, dateandtime, taskid){
+function out(task, priority, dateandtime, taskid, taskstat){
 
     let element = document.getElementById('out');
 
     let outDiv = document.createElement('div');
+    let date = document.createElement('div');
+    let dateconfirm = document.createElement('div');
+    let datecancel = document.createElement('div');
     let buttonOK = document.createElement('button');
     let buttonNO = document.createElement('button');
     let buttonDELETE = document.createElement('button');
 
-    //buttonOK.src = "./images/ok.svg";
+    buttonOK.classList.add("btnOK");
+    buttonNO.classList.add("btnNO");
+    buttonDELETE.classList.add("btnDELETE");
+
     buttonOK.innerHTML = 'OK';
     buttonNO.innerHTML = 'NO';
     buttonDELETE.innerHTML = 'DELETE';
 
-    buttonOK.addEventListener('click', test);
-    buttonNO.addEventListener('click', test);
-    buttonDELETE.addEventListener('click', test);
+    buttonOK.addEventListener('click', function(){
+        tsksstat[outDiv.id].taskstatus = true;
+
+        document.getElementById('out').innerHTML = "";
+
+        for (let param in tsks){
+            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus);
+
+            dateconfirm.innerHTML = new Date().toUTCString();
+        }
+    });
+
+  //  buttonNO.addEventListener('click', cancelTASK);
+
+    buttonDELETE.addEventListener('click', function(){
+        element.removeChild(outDiv);
+        if (tsks.length === 1){
+            tsks.length = 0;
+            tskstime.length = 0;
+            tsksid.length = 0;
+            tsksstat.length = 0;
+        }
+
+        for(let param in tsks) {
+            if (param === outDiv.id) {
+                tsks.splice(param, 1);
+                tskstime.splice(param, 1);
+                tsksid.splice(param, 1);
+                tsksstat.splice(param, 1);
+            }
+        }
+
+            if (tsks.length != 0) {
+                localStorage.setItem('tasks', JSON.stringify(tsks));
+                localStorage.setItem('taskst', JSON.stringify(tskstime));
+                localStorage.setItem('tasksi', JSON.stringify(tsksid));
+                localStorage.setItem('taskstat', JSON.stringify(tsksstat));
+            }
+            else {
+                localStorage.clear();
+            }
+    })
 
     outDiv.innerHTML = priority + ' ' + task + ' ';
+    date.innerHTML = dateandtime;
+    //dateconfirm.innerHTML = new Date().toUTCString();
+    //datecancel.innerHTML = new Date().toUTCString();
 
     outDiv.id = String(taskid);
 
     outDiv.appendChild(buttonOK);
     outDiv.appendChild(buttonNO);
     outDiv.appendChild(buttonDELETE);
+    outDiv.appendChild(date);
+    outDiv.appendChild(datecancel);
+    outDiv.appendChild(dateconfirm);
     element.appendChild(outDiv);
-
-    outDiv.innerHTML += '<br>' + dateandtime;
-}
-
-function test() {
-    alert('что-то работет');
 }
 
 //фильтр по приоритетам
@@ -93,16 +146,15 @@ document.getElementById('filter').onclick = function (){
     for (let param in tsks) {
 
         if (document.getElementById('high').checked && tsks[param].priority === 'high'){
-           out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid);
-       }
-
-        if (document.getElementById('normal').checked && tsks[param].priority === 'normal'){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid);
+           out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus);
+        }else if (document.getElementById('normal').checked && tsks[param].priority === 'normal'){
+            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus);
+        }else if (document.getElementById('low').checked && tsks[param].priority === 'low'){
+            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus);
         }
-
-        if (document.getElementById('low').checked && tsks[param].priority === 'low'){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid);
-        }
+        //else if (!((document.getElementById('high').checked) && (document.getElementById('normal').checked) && (document.getElementById('low').checked))){
+        //  out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid);
+        // }
     }
 };
 

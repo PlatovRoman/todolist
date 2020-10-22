@@ -1,3 +1,24 @@
 body {
     text-align: center;
 }
+
+.btnOK{
+    /* background-image: url('/images/ok.svg');
+    width: 150px;
+    height: 150px;*/
+    background: #1aff1a ;
+}
+
+.btnNO{
+    /* background-image: url('/images/ok.svg');
+    width: 150px;
+    height: 150px;*/
+    background: #f52330;
+}
+
+.btnDELETE{
+    /* background-image: url('/images/ok.svg');
+    width: 150px;
+    height: 150px;*/
+    background: #fff7f7;
+}
