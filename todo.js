@@ -1,4 +1,25 @@
 let tsks = [];
+/*tsks.push({
+   id: '1',
+   name: 'sdfdsgs'
+});*/
+// todo переделать под массивы
+// {
+//   id,
+//   timeStart,
+//   timeFinish
+//   taskName
+//   priority
+//   isCompleted
+// }
+// filterStatus = {
+//      high,
+//      medium
+//      low
+//      isCompleted
+// }
+// tasksFiltered = [];
+// tasksFiltered = tasks.filter()
 let tskstime = [];
 let tsksid = [];
 let tsksstat = [];
@@ -32,6 +53,11 @@ document.getElementById('add').onclick = function (){
         alert('Вы не ввели задачу.');
         return;
     }
+    // todo
+    // записать в массив tasks
+    // считать данные фильтра и обновить объект filterStatus
+    // в соответствии с фильтром добавить элементы в tasksFiltered
+    // renderElements() отрисовать элементы из tasksFiltered
 
     //для сортировки
     if (tsks.length > 1){
@@ -95,12 +121,34 @@ document.getElementById('add').onclick = function (){
     localStorage.setItem('taskcanc', JSON.stringify(tskstimecancel));
 
     out(tsks[tsks.length-1].task, tsks[tsks.length-1].priority, tskstime[tskstime.length-1].dateandtime,tsksid[tsksid.length-1].taskid, tsksstat[tsksstat.length-1].taskstatus, tskstimeconfirm[tskstimeconfirm.length-1].timeconfirm, tskstimecancel[tskstimecancel.length-1].timecancel);
+};
+
+function onTaskTextClick(currentId, taskText) {
+    let outDivById = document.getElementById(currentId);
+    let textInput = document.createElement('input');
+    textInput.value = taskText.innerHTML;
+    textInput.id = 'taskText' + currentId;
+    let saveEdit = document.createElement('button');
+    saveEdit.innerHTML = 'Save Edit';
+    saveEdit.addEventListener('click', function () {
+        let taskText = document.createElement('div');
+        taskText.innerHTML = textInput.value;
+        taskText.id = 'taskText' + currentId;
+        taskText.addEventListener('click', function () {
+            onTaskTextClick(currentId, taskText)
+        });
+        outDivById.replaceChild(taskText, textInput);
+        outDivById.removeChild(saveEdit);
+    });
+    outDivById.replaceChild(textInput, taskText);
+    outDivById.appendChild(saveEdit);
 }
 
 function out(task, priority, dateandtime, taskid, taskstat, timeconfirm, timecancel){
 
     let element = document.getElementById('out');
     let outDiv = document.createElement('div');
+    let taskText = document.createElement('div');
     let date = document.createElement('div');
     let dateconfirm = document.createElement('div');
     let datecancel = document.createElement('div');
@@ -116,6 +164,11 @@ function out(task, priority, dateandtime, taskid, taskstat, timeconfirm, timecan
     buttonOK.innerHTML = 'OK';
     buttonNO.innerHTML = 'NO';
     buttonDELETE.innerHTML = 'DELETE';
+
+    taskText.addEventListener('click', function(){
+        // document.getElementById('out').innerHTML = "";
+        onTaskTextClick(outDiv.id, taskText);
+    });
 
 
     buttonOK.addEventListener('click', function(){
@@ -197,10 +250,13 @@ function out(task, priority, dateandtime, taskid, taskstat, timeconfirm, timecan
             else {
                 localStorage.clear();
             }
-    })
+    });
 
 
-    outDiv.innerHTML = priority + ': ' + task + ' ';
+    outDiv.innerHTML = priority /*+ ': ' + task + ' '*/;
+  //  taskInput.disabled = true;
+    taskText.innerHTML = task;
+    taskText.id = 'taskText' + taskid;
     date.innerHTML = 'Create: ' + dateandtime;
 
     if (timeconfirm !== null ){
@@ -213,7 +269,7 @@ function out(task, priority, dateandtime, taskid, taskstat, timeconfirm, timecan
 
     outDiv.id = String(taskid);
     outDiv.classList.add("task");
-
+    outDiv.appendChild(taskText);
     outDiv.appendChild(buttonOK);
     outDiv.appendChild(buttonNO);
     outDiv.appendChild(buttonDELETE);
