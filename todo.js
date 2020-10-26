@@ -33,6 +33,28 @@ document.getElementById('add').onclick = function (){
         return;
     }
 
+    //для сортировки
+    if (tsks.length > 1){
+
+    let elems = document.getElementById('out').children;
+    let arrhelpsort = [];
+
+    for (let elem of elems) {
+        arrhelpsort.push(elem.id);
+    }
+
+        if (tskstime[arrhelpsort[0]].dateandtime > tskstime[arrhelpsort[1]].dateandtime){
+            arrhelpsort.reverse();
+
+            document.getElementById('out').innerHTML = "";
+
+            for(let param in arrhelpsort) {
+                out(tsks[arrhelpsort[param]].task, tsks[arrhelpsort[param]].priority, tskstime[arrhelpsort[param]].dateandtime, tsksid[arrhelpsort[param]].taskid, tsksstat[arrhelpsort[param]].taskstatus, tskstimeconfirm[arrhelpsort[param]].timeconfirm, tskstimecancel[arrhelpsort[param]].timecancel);
+            }
+        }
+    }
+
+
     let arrhelp1 = {};
     arrhelp1.task = document.getElementById('input').value;
     arrhelp1.priority = document.getElementById('slt').value;
@@ -170,7 +192,7 @@ function out(task, priority, dateandtime, taskid, taskstat, timeconfirm, timecan
     })
 
 
-    outDiv.innerHTML = priority + ' ' + task + ' ';
+    outDiv.innerHTML = priority + ': ' + task + ' ';
     date.innerHTML = 'Create: ' + dateandtime;
 
     if (timeconfirm !== null ){
@@ -182,6 +204,8 @@ function out(task, priority, dateandtime, taskid, taskstat, timeconfirm, timecan
     }
 
     outDiv.id = String(taskid);
+    outDiv.classList.add("task");
+
 
     outDiv.appendChild(buttonOK);
     outDiv.appendChild(buttonNO);
@@ -223,40 +247,21 @@ document.getElementById('filter').onclick = function (){
 
 //сортировка по дате
 document.getElementById('filterDate').onclick = function (){
+
+
+
+    let elems = document.getElementById('out').children;
+    let arrhelpsort = [];
+
+    for (let elem of elems) {
+        arrhelpsort.push(elem.id);
+    }
+
+    arrhelpsort.reverse();
+
     document.getElementById('out').innerHTML = "";
 
-    for (let param in tsks) {
-        out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-    }
+   for(let param in arrhelpsort) {
+       out(tsks[arrhelpsort[param]].task, tsks[arrhelpsort[param]].priority, tskstime[arrhelpsort[param]].dateandtime, tsksid[arrhelpsort[param]].taskid, tsksstat[arrhelpsort[param]].taskstatus, tskstimeconfirm[arrhelpsort[param]].timeconfirm, tskstimecancel[arrhelpsort[param]].timecancel);
+   }
 }
-
-
-/*
-
-    //сортировка по дате
-    document.getElementById('filterDate').onclick = function (){
-        reversedtsks = tsks.reverse();
-        reversedtskstime = tskstime.reverse();
-
-        let out = '';
-
-        for (let param in reversedtsks){
-            switch(reversedtsks[param].priority) {
-                case 'high':
-                    out += 'Высокий приоритет: ';
-                    break;
-
-                case 'normal':
-                    out += 'Обычный приоритет: ';
-                    break;
-
-                case 'low':
-                    out += 'Низкий приоритет: ';
-                    break;
-                default:
-                    break;
-            }
-
-            out += reversedtsks[param].task;
-
-*/
