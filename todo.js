@@ -169,12 +169,20 @@ function out(task, priority, dateandtime, taskid, taskstat, timeconfirm, timecan
 
         for(let param in tsks) {
             if (param === outDiv.id) {
-                tsks.splice(param, 1);
+                //если так, то проблема с сортировкой (не знаю, почему)
+                /*tsks.splice(param, 1);
                 tskstime.splice(param, 1);
                 tsksid.splice(param, 1);
                 tsksstat.splice(param, 1);
                 tskstimeconfirm.splice(param, 1);
-                tskstimecancel.splice(param, 1);
+                tskstimecancel.splice(param, 1);*/
+                //если так, то проблема с localStorage, на который вроде как все равно
+                delete tsks[param];
+                delete tskstime[param];
+                delete tsksid[param];
+                delete tsksstat[param];
+                delete tskstimeconfirm[param];
+                delete tskstimecancel[param];
             }
         }
 
@@ -205,7 +213,6 @@ function out(task, priority, dateandtime, taskid, taskstat, timeconfirm, timecan
 
     outDiv.id = String(taskid);
     outDiv.classList.add("task");
-
 
     outDiv.appendChild(buttonOK);
     outDiv.appendChild(buttonNO);
@@ -247,8 +254,6 @@ document.getElementById('filter').onclick = function (){
 
 //сортировка по дате
 document.getElementById('filterDate').onclick = function (){
-
-
 
     let elems = document.getElementById('out').children;
     let arrhelpsort = [];
