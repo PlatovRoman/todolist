@@ -10,14 +10,14 @@ body {
 }
 
 .btnNO{
-    /* background-image: url('/images/ok.svg');
+    /* background-image: url('/images/no.svg');
     width: 150px;
     height: 150px;*/
     background: #f52330;
 }
 
 .btnDELETE{
-    /* background-image: url('/images/ok.svg');
+    /* background-image: url('/images/delete.svg');
     width: 150px;
     height: 150px;*/
     background: #fff7f7;
