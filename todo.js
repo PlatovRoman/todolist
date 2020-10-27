@@ -27,11 +27,14 @@ document.getElementById('add').onclick = function () {
         return;
     };
 
+    let newId = 0;
+    tasks.length === 0 ? newId = 0 : newId = tasks[tasks.length-1].id + 1;
+
     tasks.push({
         taskName: document.getElementById('input').value,
         priority: document.getElementById('slt').value,
         timeCreate: new Date().toUTCString(),
-        id: tasks.length,
+        id: newId,
         isCompleted: false,
         timeConfirm: null,
         timeCancel: null
@@ -41,10 +44,6 @@ document.getElementById('add').onclick = function () {
 
     reloadTasksFiltered();
     out();
-
-    console.log(tasks);
-    //console.log(filterStatus);
-    console.log(tasksFiltered);
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //созраняем изменения состояния фильтра в filterStatus//////////////////////////////////////////////////////////////////
@@ -54,11 +53,8 @@ document.getElementById('completed').addEventListener('click', function(){
     }else{
         filterStatus.isCompleted = false;
     }
-    //let element = document.getElementById('out');
-    //element.innerHTML = '';
     reloadTasksFiltered();
     out();
-    //вывести результат
 });
 document.getElementById('high').addEventListener('click', function(){
     if (document.getElementById('high').checked){
@@ -68,7 +64,6 @@ document.getElementById('high').addEventListener('click', function(){
     }
     reloadTasksFiltered();
     out();
-    //вывести результат
 });
 document.getElementById('normal').addEventListener('click', function(){
     if (document.getElementById('normal').checked){
@@ -78,7 +73,6 @@ document.getElementById('normal').addEventListener('click', function(){
     }
     reloadTasksFiltered();
     out();
-    //вывести результат
 });
 document.getElementById('low').addEventListener('click', function(){
     if (document.getElementById('low').checked){
@@ -88,7 +82,6 @@ document.getElementById('low').addEventListener('click', function(){
     }
     reloadTasksFiltered();
     out();
-    //вывести результат
 });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //копируем значения из tasks в tasksFiltered с условием filterStatus////////////////////////////////////////////////////
@@ -124,58 +117,62 @@ function reloadTasksFiltered(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //отрисовываем tasksFiltered(функционал всего нового)///////////////////////////////////////////////////////////////////
 function out(){
-        let element = document.getElementById('out');
-        let outDiv = document.createElement('div');
-        let taskText = document.createElement('div');
-        let dateconfirm = document.createElement('div');
-        let datecancel = document.createElement('div');
-        let buttonOK = document.createElement('button');
-        let buttonNO = document.createElement('button');
-        let buttonDELETE = document.createElement('button');
-        //let date = document.createElement('div');
-
-        buttonOK.classList.add("btnOK");
-        buttonNO.classList.add("btnNO");
-        buttonDELETE.classList.add("btnDELETE");
-
-        buttonOK.innerHTML = 'OK';
-        buttonNO.innerHTML = 'NO';
-        buttonDELETE.innerHTML = 'DELETE';
-//кнопка OK/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    buttonOK.addEventListener('click', function(){
-        tasks[outDiv.id].isCompleted = true;
-        tasks[outDiv.id].timeConfirm = new Date().toUTCString();
-        tasks[outDiv.id].timeCancel = null;
-
-        reloadTasksFiltered();
-        out();
-    });
-//кнопка NO/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    buttonNO.addEventListener('click', function(){
-        tasks[outDiv.id].isCompleted = false;
-        tasks[outDiv.id].timeConfirm = null;
-        tasks[outDiv.id].timeCancel = new Date().toUTCString();
-
-        reloadTasksFiltered();
-        out();
-    });
-//кнопка DELETE/////////////////////////////////////////////////////////////////////////////////////////////////////////
-    buttonDELETE.addEventListener('click', function(){
-        element.removeChild(outDiv);
-
-        for(let param of tasks) {
-            if (param === outDiv.id) {
-                tasks.splice(param, 1);
-            }
-        }
-    });
+    let element = document.getElementById('out');
+    element.innerHTML = '';
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         tasksFiltered.forEach(function (item, i) {
-            outDiv.innerHTML = '';
+
+            let outDiv = document.createElement('div');
+            let taskText = document.createElement('div');
+            let dateconfirm = document.createElement('div');
+            let datecancel = document.createElement('div');
+            let buttonOK = document.createElement('button');
+            let buttonNO = document.createElement('button');
+            let buttonDELETE = document.createElement('button');
+
+            buttonOK.classList.add("btnOK");
+            buttonNO.classList.add("btnNO");
+            buttonDELETE.classList.add("btnDELETE");
+
+            buttonOK.innerHTML = 'OK';
+            buttonNO.innerHTML = 'NO';
+            buttonDELETE.innerHTML = 'DELETE';
+//клик по задаче////////////////////////////////////////////////////////////////////////////////////////////////////////
+            taskText.addEventListener('click', function(){
+                onTaskTextClick(outDiv.id, taskText);
+            });
+//кнопка OK/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            buttonOK.addEventListener('click', function(){
+                tasks[item.id].isCompleted = true;
+                tasks[item.id].timeConfirm = new Date().toUTCString();
+                tasks[item.id].timeCancel = null;
+
+                reloadTasksFiltered();
+                out();
+            });
+//кнопка NO/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            buttonNO.addEventListener('click', function(){
+                tasks[item.id].isCompleted = false;
+                tasks[item.id].timeConfirm = null;
+                tasks[item.id].timeCancel = new Date().toUTCString();
+
+                reloadTasksFiltered();
+                out();
+            });
+//кнопка DELETE/////////////////////////////////////////////////////////////////////////////////////////////////////////
+            buttonDELETE.addEventListener('click', function(){
+                element.removeChild(outDiv);
+
+                tasks.forEach((param, i) => {
+                    if (param.id === item.id) {
+                        tasks.splice(i, 1);
+                    }
+                })
+            });
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             outDiv.innerHTML += item.priority + '(^_^) Create: ' + item.timeCreate;
             taskText.innerHTML = item.taskName;
-            //taskText.id = 'taskText' + taskid;
-            //date.innerHTML = ' Create: ' + item.timeCreate;
+            taskText.id = 'taskText' + item.id;
 
             if (item.timeConfirm !== null) {
                 dateconfirm.innerHTML = 'Confirm: ' + item.timeConfirm;
@@ -191,9 +188,37 @@ function out(){
             outDiv.appendChild(buttonOK);
             outDiv.appendChild(buttonNO);
             outDiv.appendChild(buttonDELETE);
-            //outDiv.appendChild(date);
             outDiv.appendChild(datecancel);
             outDiv.appendChild(dateconfirm);
             element.appendChild(outDiv);
         });
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//обработчик события для сортировки по времени//////////////////////////////////////////////////////////////////////////
+document.getElementById('filterDate').addEventListener('click', function(){
+    tasksFiltered.reverse();
+    out();
+});
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//обработчик события для сортировки по времени//////////////////////////////////////////////////////////////////////////
+function onTaskTextClick(currentId, taskText) {
+     let outDivById = document.getElementById(currentId);
+     let textInput = document.createElement('input');
+     textInput.value = taskText.innerHTML;
+     textInput.id = 'taskText' + currentId;
+     let saveEdit = document.createElement('button');
+     saveEdit.innerHTML = 'Save Edit';
+     saveEdit.addEventListener('click', function () {
+         let taskText = document.createElement('div');
+         taskText.innerHTML = textInput.value;
+         taskText.id = 'taskText' + currentId;
+         taskText.addEventListener('click', function () {
+             onTaskTextClick(currentId, taskText)
+         });
+         outDivById.replaceChild(taskText, textInput);
+         outDivById.removeChild(saveEdit);
+     });
+     outDivById.replaceChild(textInput, taskText);
+     outDivById.appendChild(saveEdit);
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
