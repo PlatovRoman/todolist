@@ -1,328 +1,199 @@
-let tsks = [];
-/*tsks.push({
-   id: '1',
-   name: 'sdfdsgs'
-});*/
-// todo переделать под массивы
+
 // {
+//   taskName,
+//   priority,
+//   timeCreate,
 //   id,
-//   timeStart,
-//   timeFinish
-//   taskName
-//   priority
-//   isCompleted
+//   isCompleted,
+//   timeConfirm,
+//   timeCancel
 // }
-// filterStatus = {
-//      high,
-//      medium
-//      low
-//      isCompleted
-// }
-// tasksFiltered = [];
-// tasksFiltered = tasks.filter()
-let tskstime = [];
-let tsksid = [];
-let tsksstat = [];
-let tskstimeconfirm = [];
-let tskstimecancel = [];
 
-if (confirm('Восстановить последние сохраненные данные?')){
-    if (!(localStorage.getItem('tasks') === null)){
-        tsks =  JSON.parse(localStorage.getItem('tasks'));
-        tskstime =  JSON.parse(localStorage.getItem('taskst'));
-        tsksid =  JSON.parse(localStorage.getItem('tasksi'));
-        tsksstat = JSON.parse(localStorage.getItem('taskstat'));
-        tskstimeconfirm = JSON.parse(localStorage.getItem('taskconf'));
-        tskstimecancel = JSON.parse(localStorage.getItem('taskcanc'));
-
-        for(let param in tsks) {
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-        }
-    }
-    else {
-        alert('Сохраненных данных нет.');
-    }
-}
-else{
-    localStorage.clear();
-}
-
-document.getElementById('add').onclick = function (){
+//глобальные данные/////////////////////////////////////////////////////////////////////////////////////////////////////
+let tasks = [];
+let filterStatus = {
+    isCompleted: false,
+    isHigh: false,
+    isNormal: false,
+    isLow: false
+};
+let tasksFiltered = [];
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//обрабатываем нажатие ДОБАВИТЬ/////////////////////////////////////////////////////////////////////////////////////////
+document.getElementById('add').onclick = function () {
 
     if (document.getElementById('input').value === '') {
         alert('Вы не ввели задачу.');
         return;
-    }
-    // todo
-    // записать в массив tasks
-    // считать данные фильтра и обновить объект filterStatus
-    // в соответствии с фильтром добавить элементы в tasksFiltered
-    // renderElements() отрисовать элементы из tasksFiltered
+    };
 
-    //для сортировки
-    if (tsks.length > 1){
-
-    let elems = document.getElementById('out').children;
-    let arrhelpsort = [];
-
-    for (let elem of elems) {
-        arrhelpsort.push(elem.id);
-    }
-
-        if (tskstime[arrhelpsort[0]].dateandtime > tskstime[arrhelpsort[1]].dateandtime){
-            arrhelpsort.reverse();
-
-            document.getElementById('out').innerHTML = "";
-
-            for(let param in arrhelpsort) {
-                out(tsks[arrhelpsort[param]].task, tsks[arrhelpsort[param]].priority, tskstime[arrhelpsort[param]].dateandtime, tsksid[arrhelpsort[param]].taskid, tsksstat[arrhelpsort[param]].taskstatus, tskstimeconfirm[arrhelpsort[param]].timeconfirm, tskstimecancel[arrhelpsort[param]].timecancel);
-            }
-        }
-    }
-
-
-    let arrhelp1 = {};
-    arrhelp1.task = document.getElementById('input').value;
-    arrhelp1.priority = document.getElementById('slt').value;
-    tsks[tsks.length] = arrhelp1;
-
-    let arrhelp2 = {};
-    arrhelp2.task = document.getElementById('input').value;
-    arrhelp2.dateandtime =new Date().toUTCString();
-    tskstime[tskstime.length] = arrhelp2;
-
-    let arrhelp3 = {};
-    arrhelp3.task = document.getElementById('input').value;
-    arrhelp3.taskid = tsks.length-1;
-    tsksid[tsksid.length] = arrhelp3;
-
-    let arrhelp4 = {};
-    arrhelp4.task = document.getElementById('input').value;
-    arrhelp4.taskstatus = false;
-    tsksstat[tsksstat.length] = arrhelp4;
-
-    let arrhelp5 = {};
-    arrhelp5.task = document.getElementById('input').value;
-    arrhelp5.timeconfirm = null;
-    tskstimeconfirm[tskstimeconfirm.length] = arrhelp5;
-
-    let arrhelp6 = {};
-    arrhelp6.task = document.getElementById('input').value;
-    arrhelp6.timecancel = null;
-    tskstimecancel[tskstimecancel.length] = arrhelp6;
+    tasks.push({
+        taskName: document.getElementById('input').value,
+        priority: document.getElementById('slt').value,
+        timeCreate: new Date().toUTCString(),
+        id: tasks.length,
+        isCompleted: false,
+        timeConfirm: null,
+        timeCancel: null
+    });
 
     document.getElementById('input').value = '';
 
-    localStorage.setItem('tasks', JSON.stringify(tsks));
-    localStorage.setItem('taskst', JSON.stringify(tskstime));
-    localStorage.setItem('tasksi', JSON.stringify(tsksid));
-    localStorage.setItem('taskstat', JSON.stringify(tsksstat));
-    localStorage.setItem('taskconf', JSON.stringify(tskstimeconfirm));
-    localStorage.setItem('taskcanc', JSON.stringify(tskstimecancel));
+    reloadTasksFiltered();
+    out();
 
-    out(tsks[tsks.length-1].task, tsks[tsks.length-1].priority, tskstime[tskstime.length-1].dateandtime,tsksid[tsksid.length-1].taskid, tsksstat[tsksstat.length-1].taskstatus, tskstimeconfirm[tskstimeconfirm.length-1].timeconfirm, tskstimecancel[tskstimecancel.length-1].timecancel);
+    console.log(tasks);
+    //console.log(filterStatus);
+    console.log(tasksFiltered);
 };
-
-function onTaskTextClick(currentId, taskText) {
-    let outDivById = document.getElementById(currentId);
-    let textInput = document.createElement('input');
-    textInput.value = taskText.innerHTML;
-    textInput.id = 'taskText' + currentId;
-    let saveEdit = document.createElement('button');
-    saveEdit.innerHTML = 'Save Edit';
-    saveEdit.addEventListener('click', function () {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//созраняем изменения состояния фильтра в filterStatus//////////////////////////////////////////////////////////////////
+document.getElementById('completed').addEventListener('click', function(){
+    if (document.getElementById('completed').checked){
+        filterStatus.isCompleted = true;
+    }else{
+        filterStatus.isCompleted = false;
+    }
+    //let element = document.getElementById('out');
+    //element.innerHTML = '';
+    reloadTasksFiltered();
+    out();
+    //вывести результат
+});
+document.getElementById('high').addEventListener('click', function(){
+    if (document.getElementById('high').checked){
+        filterStatus.isHigh = true;
+    }else{
+        filterStatus.isHigh = false;
+    }
+    reloadTasksFiltered();
+    out();
+    //вывести результат
+});
+document.getElementById('normal').addEventListener('click', function(){
+    if (document.getElementById('normal').checked){
+        filterStatus.isNormal = true;
+    }else{
+        filterStatus.isNormal = false;
+    }
+    reloadTasksFiltered();
+    out();
+    //вывести результат
+});
+document.getElementById('low').addEventListener('click', function(){
+    if (document.getElementById('low').checked){
+        filterStatus.isLow = true;
+    }else{
+        filterStatus.isLow = false;
+    }
+    reloadTasksFiltered();
+    out();
+    //вывести результат
+});
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//копируем значения из tasks в tasksFiltered с условием filterStatus////////////////////////////////////////////////////
+function reloadTasksFiltered(){
+    tasksFiltered.length = 0;
+    tasks.forEach(function(item, i) {
+        if (filterStatus.isCompleted) {
+            if (item.isCompleted && filterStatus.isHigh && item.priority === 'high'){
+                tasksFiltered.push(item);
+            }else if (item.isCompleted && filterStatus.isNormal && item.priority === 'normal'){
+                tasksFiltered.push(item);
+            }else if(item.isCompleted && filterStatus.isLow && item.priority === 'low'){
+                tasksFiltered.push(item);
+            }else if (item.isCompleted && !(filterStatus.isHigh && filterStatus.isNormal && filterStatus.isLow)){
+                tasksFiltered.push(item);
+            }
+        }else{
+            if (filterStatus.isHigh && item.priority === 'high'){
+                tasksFiltered.push(item);
+            }
+            if (filterStatus.isNormal && item.priority === 'normal'){
+                tasksFiltered.push(item);
+            }
+            if(filterStatus.isLow && item.priority === 'low'){
+                tasksFiltered.push(item);
+            }
+            if (!(filterStatus.isHigh || filterStatus.isNormal || filterStatus.isLow)){
+                tasksFiltered.push(item);
+            }
+        };
+    });
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//отрисовываем tasksFiltered(функционал всего нового)///////////////////////////////////////////////////////////////////
+function out(){
+        let element = document.getElementById('out');
+        let outDiv = document.createElement('div');
         let taskText = document.createElement('div');
-        taskText.innerHTML = textInput.value;
-        taskText.id = 'taskText' + currentId;
-        taskText.addEventListener('click', function () {
-            onTaskTextClick(currentId, taskText)
-        });
-        outDivById.replaceChild(taskText, textInput);
-        outDivById.removeChild(saveEdit);
-    });
-    outDivById.replaceChild(textInput, taskText);
-    outDivById.appendChild(saveEdit);
-}
+        let dateconfirm = document.createElement('div');
+        let datecancel = document.createElement('div');
+        let buttonOK = document.createElement('button');
+        let buttonNO = document.createElement('button');
+        let buttonDELETE = document.createElement('button');
+        //let date = document.createElement('div');
 
-function out(task, priority, dateandtime, taskid, taskstat, timeconfirm, timecancel){
+        buttonOK.classList.add("btnOK");
+        buttonNO.classList.add("btnNO");
+        buttonDELETE.classList.add("btnDELETE");
 
-    let element = document.getElementById('out');
-    let outDiv = document.createElement('div');
-    let taskText = document.createElement('div');
-    let date = document.createElement('div');
-    let dateconfirm = document.createElement('div');
-    let datecancel = document.createElement('div');
-    let buttonOK = document.createElement('button');
-    let buttonNO = document.createElement('button');
-    let buttonDELETE = document.createElement('button');
-
-
-    buttonOK.classList.add("btnOK");
-    buttonNO.classList.add("btnNO");
-    buttonDELETE.classList.add("btnDELETE");
-
-    buttonOK.innerHTML = 'OK';
-    buttonNO.innerHTML = 'NO';
-    buttonDELETE.innerHTML = 'DELETE';
-
-    taskText.addEventListener('click', function(){
-        // document.getElementById('out').innerHTML = "";
-        onTaskTextClick(outDiv.id, taskText);
-    });
-
-
+        buttonOK.innerHTML = 'OK';
+        buttonNO.innerHTML = 'NO';
+        buttonDELETE.innerHTML = 'DELETE';
+//кнопка OK/////////////////////////////////////////////////////////////////////////////////////////////////////////////
     buttonOK.addEventListener('click', function(){
-        tsksstat[outDiv.id].taskstatus = true;
-        tskstimeconfirm[outDiv.id].timeconfirm = new Date().toUTCString();
-        tskstimecancel[outDiv.id].timecancel = null;
+        tasks[outDiv.id].isCompleted = true;
+        tasks[outDiv.id].timeConfirm = new Date().toUTCString();
+        tasks[outDiv.id].timeCancel = null;
 
-        timeconfirm = tskstimeconfirm[outDiv.id].timeconfirm;
-
-        document.getElementById('out').innerHTML = "";
-
-        for (let param in tsks){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-        }
-
-        localStorage.setItem('taskconf', JSON.stringify(tskstimeconfirm));
-        localStorage.setItem('taskcanc', JSON.stringify(tskstimecancel));
-        localStorage.setItem('taskstat', JSON.stringify(tsksstat));
-
+        reloadTasksFiltered();
+        out();
     });
-
+//кнопка NO/////////////////////////////////////////////////////////////////////////////////////////////////////////////
     buttonNO.addEventListener('click', function(){
-        tskstimecancel[outDiv.id].timecancel = new Date().toUTCString();
-        tskstimeconfirm[outDiv.id].timeconfirm = null;
-        tsksstat[outDiv.id].taskstatus = false;
+        tasks[outDiv.id].isCompleted = false;
+        tasks[outDiv.id].timeConfirm = null;
+        tasks[outDiv.id].timeCancel = new Date().toUTCString();
 
-        timecancel = tskstimecancel[outDiv.id].timecancel;
-
-        document.getElementById('out').innerHTML = "";
-
-        for (let param in tsks){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-        }
-
-        localStorage.setItem('taskcanc', JSON.stringify(tskstimecancel));
-        localStorage.setItem('taskconf', JSON.stringify(tskstimeconfirm));
-        localStorage.setItem('taskstat', JSON.stringify(tsksstat));
-
+        reloadTasksFiltered();
+        out();
     });
-
+//кнопка DELETE/////////////////////////////////////////////////////////////////////////////////////////////////////////
     buttonDELETE.addEventListener('click', function(){
         element.removeChild(outDiv);
-        if (tsks.length === 1){
-            tsks.length = 0;
-            tskstime.length = 0;
-            tsksid.length = 0;
-            tsksstat.length = 0;
-            tskstimeconfirm.length = 0;
-            tskstimecancel.length = 0;
-        }
 
-        for(let param in tsks) {
+        for(let param of tasks) {
             if (param === outDiv.id) {
-                //если так, то проблема с сортировкой (не знаю, почему)
-                /*tsks.splice(param, 1);
-                tskstime.splice(param, 1);
-                tsksid.splice(param, 1);
-                tsksstat.splice(param, 1);
-                tskstimeconfirm.splice(param, 1);
-                tskstimecancel.splice(param, 1);*/
-                //если так, то проблема с localStorage, на который вроде как все равно
-                delete tsks[param];
-                delete tskstime[param];
-                delete tsksid[param];
-                delete tsksstat[param];
-                delete tskstimeconfirm[param];
-                delete tskstimecancel[param];
+                tasks.splice(param, 1);
             }
         }
-
-            if (tsks.length != 0) {
-                localStorage.setItem('tasks', JSON.stringify(tsks));
-                localStorage.setItem('taskst', JSON.stringify(tskstime));
-                localStorage.setItem('tasksi', JSON.stringify(tsksid));
-                localStorage.setItem('taskstat', JSON.stringify(tsksstat));
-                localStorage.setItem('taskconf', JSON.stringify(tskstimeconfirm));
-                localStorage.setItem('taskcanc', JSON.stringify(tskstimecancel));
-            }
-            else {
-                localStorage.clear();
-            }
     });
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        tasksFiltered.forEach(function (item, i) {
+            outDiv.innerHTML = '';
+            outDiv.innerHTML += item.priority + '(^_^) Create: ' + item.timeCreate;
+            taskText.innerHTML = item.taskName;
+            //taskText.id = 'taskText' + taskid;
+            //date.innerHTML = ' Create: ' + item.timeCreate;
 
+            if (item.timeConfirm !== null) {
+                dateconfirm.innerHTML = 'Confirm: ' + item.timeConfirm;
+            }
 
-    outDiv.innerHTML = priority /*+ ': ' + task + ' '*/;
-  //  taskInput.disabled = true;
-    taskText.innerHTML = task;
-    taskText.id = 'taskText' + taskid;
-    date.innerHTML = 'Create: ' + dateandtime;
+            if (item.timeCancel !== null) {
+                datecancel.innerHTML = 'Cancel: ' + item.timeCancel;
+            }
 
-    if (timeconfirm !== null ){
-       dateconfirm.innerHTML = 'Confirm: ' + timeconfirm;
-    }
-
-    if (timecancel !== null ){
-        datecancel.innerHTML = 'Cancel: ' + timecancel;
-    }
-
-    outDiv.id = String(taskid);
-    outDiv.classList.add("task");
-    outDiv.appendChild(taskText);
-    outDiv.appendChild(buttonOK);
-    outDiv.appendChild(buttonNO);
-    outDiv.appendChild(buttonDELETE);
-    outDiv.appendChild(date);
-    outDiv.appendChild(datecancel);
-    outDiv.appendChild(dateconfirm);
-    element.appendChild(outDiv);
-}
-
-//фильтр по приоритетам
-document.getElementById('filter').onclick = function (){
-
-    document.getElementById('out').innerHTML = "";
-
-    for (let param in tsks) {
-
-    if (document.getElementById('completed').checked){
-        if (document.getElementById('high').checked && tsks[param].priority === 'high' && tsksstat[param].taskstatus){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-        }else if (document.getElementById('normal').checked && tsks[param].priority === 'normal' && tsksstat[param].taskstatus){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-        }else if (document.getElementById('low').checked && tsks[param].priority === 'low' && tsksstat[param].taskstatus) {
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-        }else if (tsksstat[param].taskstatus && !(document.getElementById('high').checked) && !(document.getElementById('low').checked) && !(document.getElementById('normal').checked)){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-        }
-
-    }else {
-        if (document.getElementById('high').checked && tsks[param].priority === 'high'){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-        }else if (document.getElementById('normal').checked && tsks[param].priority === 'normal'){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-        }else if (document.getElementById('low').checked && tsks[param].priority === 'low'){
-            out(tsks[param].task, tsks[param].priority, tskstime[param].dateandtime, tsksid[param].taskid, tsksstat[param].taskstatus, tskstimeconfirm[param].timeconfirm, tskstimecancel[param].timecancel);
-    }
-    }
-}}
-
-//сортировка по дате
-document.getElementById('filterDate').onclick = function (){
-
-    let elems = document.getElementById('out').children;
-    let arrhelpsort = [];
-
-    for (let elem of elems) {
-        arrhelpsort.push(elem.id);
-    }
-
-    arrhelpsort.reverse();
-
-    document.getElementById('out').innerHTML = "";
-
-   for(let param in arrhelpsort) {
-       out(tsks[arrhelpsort[param]].task, tsks[arrhelpsort[param]].priority, tskstime[arrhelpsort[param]].dateandtime, tsksid[arrhelpsort[param]].taskid, tsksstat[arrhelpsort[param]].taskstatus, tskstimeconfirm[arrhelpsort[param]].timeconfirm, tskstimecancel[arrhelpsort[param]].timecancel);
-   }
-}
+            outDiv.id = String(item.id);
+            outDiv.classList.add("task");
+            outDiv.appendChild(taskText);
+            outDiv.appendChild(buttonOK);
+            outDiv.appendChild(buttonNO);
+            outDiv.appendChild(buttonDELETE);
+            //outDiv.appendChild(date);
+            outDiv.appendChild(datecancel);
+            outDiv.appendChild(dateconfirm);
+            element.appendChild(outDiv);
+        });
+};
