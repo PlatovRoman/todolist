@@ -9,12 +9,11 @@ let filterStatus = {
 let tasksFiltered = [];
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //при запуске страницы//////////////////////////////////////////////////////////////////////////////////////////////////
-/*window.onload = function() {
-    alert('привет');
-    gettasks();
-    reloadTasksFiltered();
-    out();
-};*/
+window.onload = function() {
+    if (confirm("Восстановить данные?")){
+            gettasks();
+    }
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //обрабатываем нажатие ДОБАВИТЬ/////////////////////////////////////////////////////////////////////////////////////////
 document.getElementById('add').onclick = function () {
@@ -24,20 +23,7 @@ document.getElementById('add').onclick = function () {
         return;
     };
 
-    let newId = 0;
-    tasks.length === 0 ? newId = 0 : newId = tasks[tasks.length-1].id + 1;
-
-    /*tasks.push({
-        taskName: document.getElementById('input').value,
-        priority: document.getElementById('slt').value,
-        timeCreate: new Date().toUTCString(),
-        id: newId,
-        isCompleted: false,
-        timeConfirm: null,
-        timeCancel: null
-    });
-*/
-    tasks.push(posttasks(
+    posttasks(
         {
             taskName: document.getElementById('input').value,
             priority: document.getElementById('slt').value,
@@ -45,41 +31,29 @@ document.getElementById('add').onclick = function () {
             isCompleted: false,
             timeConfirm: null,
             timeCancel: null
-        }));
+        });
 
     document.getElementById('input').value = '';
-
-   /* reloadTasksFiltered();
-    out();*/
-
-    /*tasks.forEach((item,i){
-        // let xhr = new XMLHttpRequest();
-        // xhr.open("DELETE", "http://127.0.0.1:3000/items/:itemId");
-        // xhr.send(item.id);
-        //console.log(JSON.stringify(tasks));
-    });*/
-    console.log(tasks);
-    //gettasks();
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //созраняем изменения состояния фильтра в filterStatus//////////////////////////////////////////////////////////////////
 document.getElementById('completed').addEventListener('click', function(){
-    filterStatus.isCompleted = (document.getElementById('completed').checked) ? true : false;
+    filterStatus.isCompleted = document.getElementById('completed').checked;
     reloadTasksFiltered();
     out();
 });
 document.getElementById('high').addEventListener('click', function(){
-    filterStatus.isHigh = (document.getElementById('high').checked) ? true : false;
+    filterStatus.isHigh = document.getElementById('high').checked
     reloadTasksFiltered();
     out();
 });
 document.getElementById('normal').addEventListener('click', function(){
-   filterStatus.isNormal = (document.getElementById('normal').checked) ? true : false;
+   filterStatus.isNormal = document.getElementById('normal').checked
     reloadTasksFiltered();
     out();
 });
 document.getElementById('low').addEventListener('click', function(){
-    filterStatus.isLow = (document.getElementById('low').checked) ? true : false;
+    filterStatus.isLow = document.getElementById('low').checked
     reloadTasksFiltered();
     out();
 });
@@ -139,7 +113,7 @@ function out(){
             buttonDELETE.innerHTML = 'DELETE';
 //клик по задаче////////////////////////////////////////////////////////////////////////////////////////////////////////
             taskText.addEventListener('click', function(){
-                onTaskTextClick(outDiv.id, taskText);
+                onTaskTextClick(item.id, taskText);
             });
 //кнопка OK/////////////////////////////////////////////////////////////////////////////////////////////////////////////
             buttonOK.addEventListener('click', function(){
@@ -209,15 +183,24 @@ document.getElementById('filterDate').addEventListener('click', function(){
 function onTaskTextClick(currentId, taskText) {
      let outDivById = document.getElementById(currentId);
      let textInput = document.createElement('input');
+
      textInput.value = taskText.innerHTML;
      textInput.id = 'taskText' + currentId;
+
      let saveEdit = document.createElement('button');
      saveEdit.innerHTML = 'Save Edit';
      saveEdit.addEventListener('click', function () {
-         let taskText = document.createElement('div');
-         taskText.innerHTML = textInput.value;
-         taskText.id = 'taskText' + currentId;
-         tasks[currentId].taskName = textInput.value;
+
+        let taskText = document.createElement('div');
+        taskText.innerHTML = textInput.value;
+        taskText.id = 'taskText' + currentId;
+
+         tasks.forEach((tsk) => {
+             if (tsk.id === currentId){
+                 tsk.taskName = textInput.value;
+            }
+         });
+
          taskText.addEventListener('click', function () {
              onTaskTextClick(currentId, taskText)
          });
@@ -229,76 +212,31 @@ function onTaskTextClick(currentId, taskText) {
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //(GET)/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function gettasks() {
-    let xhr = new XMLHttpRequest();//создание запроса
-// 2. Настраиваем его: GET-запрос по URL
-    xhr.open('GET', 'http://127.0.0.1:3000/items'); //GET http://127.0.0.1:3000/items
-// 3. Отсылаем запрос
+function gettasks(taskid) {
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', 'http://127.0.0.1:3000/items');
+    xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send();
-// 4. Этот код сработает после того, как мы получим ответ сервера
-    xhr.onload = function () {
-        if (xhr.status != 200) { // анализируем HTTP-статус ответа, если статус не 200, то произошла ошибка
-            alert(`Ошибка ${xhr.status}: ${xhr.statusText}`); // Например, 404: Not Found
-        } else { // если всё прошло гладко, выводим результат
-           // alert(`Готово, получили ${xhr.response.length} байт`); // response -- это ответ сервера
-            console.log(xhr.response);
-            console.log(JSON.stringify(tasks));//JSON.parse
-            tasks = JSON.parse(xhr.response);
-        }
-    };
-    /*xhr.onprogress = function (event) {
-        if (event.lengthComputable) {
-            alert(`Получено ${event.loaded} из ${event.total} байт`);
-        } else {
-            alert(`Получено ${event.loaded} байт`); // если в ответе нет заголовка Content-Length
-        }
 
+    xhr.onload = function () {
+        tasks = JSON.parse(xhr.response);
+        reloadTasksFiltered();
+        out();
     };
-    xhr.onerror = function () {
-        alert("Запрос не удался");
-    };*/
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //(POST)////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*function upload(file) {
-    let xhr = new XMLHttpRequest();
-
-    // отслеживаем процесс отправки
-    xhr.upload.onprogress = function(event) {
-        console.log(`Отправлено ${event.loaded} из ${event.total}`);
-    };
-
-    // Ждём завершения: неважно, успешного или нет
-    xhr.onloadend = function() {
-        if (xhr.status == 200) {
-            console.log("Успех");
-        } else {
-            console.log("Ошибка " + this.status);
-        }
-    };
-
-    xhr.open("POST", "http://127.0.0.1:3000/items"); ////POST http://127.0.0.1:3000/items
-    xhr.send(file);
-}*/
-
-// заполним FormData данными из формы
-//let mass = new FormData(tasks);
-
-// добавим ещё одно поле
-//formData.append("middle", "Иванович");
-
-// отправим данные
 function posttasks(body) {
     let xhr = new XMLHttpRequest();
     xhr.open("POST", "http://127.0.0.1:3000/items");
+    xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(body));
 
-    //console.log(JSON.stringify(tasks));
-    let serverSerp;
-    xhr.onload = () => serverSerp = xhr.response;
-    return serverSerp;
-
-    //console.log(xhr.response);
+    xhr.onload = function() {
+        tasks.push(JSON.parse(xhr.response));
+        reloadTasksFiltered();
+        out();
+    };
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //PUT http://127.0.0.1:3000/items/:itemId (обновление элементов)
