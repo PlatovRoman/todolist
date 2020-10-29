@@ -1,14 +1,3 @@
-
-// {
-//   taskName,
-//   priority,
-//   timeCreate,
-//   id,
-//   isCompleted,
-//   timeConfirm,
-//   timeCancel
-// }
-
 //глобальные данные/////////////////////////////////////////////////////////////////////////////////////////////////////
 let tasks = [];
 let filterStatus = {
@@ -18,6 +7,14 @@ let filterStatus = {
     isLow: false
 };
 let tasksFiltered = [];
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//при запуске страницы//////////////////////////////////////////////////////////////////////////////////////////////////
+/*window.onload = function() {
+    alert('привет');
+    gettasks();
+    reloadTasksFiltered();
+    out();
+};*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //обрабатываем нажатие ДОБАВИТЬ/////////////////////////////////////////////////////////////////////////////////////////
 document.getElementById('add').onclick = function () {
@@ -30,7 +27,7 @@ document.getElementById('add').onclick = function () {
     let newId = 0;
     tasks.length === 0 ? newId = 0 : newId = tasks[tasks.length-1].id + 1;
 
-    tasks.push({
+    /*tasks.push({
         taskName: document.getElementById('input').value,
         priority: document.getElementById('slt').value,
         timeCreate: new Date().toUTCString(),
@@ -39,11 +36,30 @@ document.getElementById('add').onclick = function () {
         timeConfirm: null,
         timeCancel: null
     });
+*/
+    tasks.push(posttasks(
+        {
+            taskName: document.getElementById('input').value,
+            priority: document.getElementById('slt').value,
+            timeCreate: new Date().toUTCString(),
+            isCompleted: false,
+            timeConfirm: null,
+            timeCancel: null
+        }));
 
     document.getElementById('input').value = '';
 
-    reloadTasksFiltered();
-    out();
+   /* reloadTasksFiltered();
+    out();*/
+
+    /*tasks.forEach((item,i){
+        // let xhr = new XMLHttpRequest();
+        // xhr.open("DELETE", "http://127.0.0.1:3000/items/:itemId");
+        // xhr.send(item.id);
+        //console.log(JSON.stringify(tasks));
+    });*/
+    console.log(tasks);
+    //gettasks();
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //созраняем изменения состояния фильтра в filterStatus//////////////////////////////////////////////////////////////////
@@ -212,36 +228,39 @@ function onTaskTextClick(currentId, taskText) {
      outDivById.appendChild(saveEdit);
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//сам пока что не понимаю, чего я хочу(GET)/////////////////////////////////////////////////////////////////////////////
-/*let xhr = new XMLHttpRequest();//создание запроса
+//(GET)/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function gettasks() {
+    let xhr = new XMLHttpRequest();//создание запроса
 // 2. Настраиваем его: GET-запрос по URL
-xhr.open('GET', 'http://127.0.0.1:3000/items'); //GET http://127.0.0.1:3000/items
+    xhr.open('GET', 'http://127.0.0.1:3000/items'); //GET http://127.0.0.1:3000/items
 // 3. Отсылаем запрос
-xhr.send();
+    xhr.send();
 // 4. Этот код сработает после того, как мы получим ответ сервера
-xhr.onload = function() {
-    if (xhr.status != 200) { // анализируем HTTP-статус ответа, если статус не 200, то произошла ошибка
-        alert(`Ошибка ${xhr.status}: ${xhr.statusText}`); // Например, 404: Not Found
-    } else { // если всё прошло гладко, выводим результат
-        alert(`Готово, получили ${xhr.response.length} байт`); // response -- это ответ сервера
-        console.log(xhr.response);
-    }
-};
-xhr.onprogress = function(event) {
-    if (event.lengthComputable) {
-        alert(`Получено ${event.loaded} из ${event.total} байт`);
-    } else {
-        alert(`Получено ${event.loaded} байт`); // если в ответе нет заголовка Content-Length
-    }
+    xhr.onload = function () {
+        if (xhr.status != 200) { // анализируем HTTP-статус ответа, если статус не 200, то произошла ошибка
+            alert(`Ошибка ${xhr.status}: ${xhr.statusText}`); // Например, 404: Not Found
+        } else { // если всё прошло гладко, выводим результат
+           // alert(`Готово, получили ${xhr.response.length} байт`); // response -- это ответ сервера
+            console.log(xhr.response);
+            console.log(JSON.stringify(tasks));//JSON.parse
+            tasks = JSON.parse(xhr.response);
+        }
+    };
+    /*xhr.onprogress = function (event) {
+        if (event.lengthComputable) {
+            alert(`Получено ${event.loaded} из ${event.total} байт`);
+        } else {
+            alert(`Получено ${event.loaded} байт`); // если в ответе нет заголовка Content-Length
+        }
 
+    };
+    xhr.onerror = function () {
+        alert("Запрос не удался");
+    };*/
 };
-xhr.onerror = function() {
-    alert("Запрос не удался");
-};*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//сам пока что не понимаю, чего я хочу(POST)////////////////////////////////////////////////////////////////////////////
-/*
-function upload(file) {
+//(POST)////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*function upload(file) {
     let xhr = new XMLHttpRequest();
 
     // отслеживаем процесс отправки
@@ -258,10 +277,30 @@ function upload(file) {
         }
     };
 
-    xhr.open("POST", "item"); ////POST http://127.0.0.1:3000/items
+    xhr.open("POST", "http://127.0.0.1:3000/items"); ////POST http://127.0.0.1:3000/items
     xhr.send(file);
 }*/
+
+// заполним FormData данными из формы
+//let mass = new FormData(tasks);
+
+// добавим ещё одно поле
+//formData.append("middle", "Иванович");
+
+// отправим данные
+function posttasks(body) {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://127.0.0.1:3000/items");
+    xhr.send(JSON.stringify(body));
+
+    //console.log(JSON.stringify(tasks));
+    let serverSerp;
+    xhr.onload = () => serverSerp = xhr.response;
+    return serverSerp;
+
+    //console.log(xhr.response);
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//PUT http://127.0.0.1:3000/items/:itemId (обновления элементов)
+//PUT http://127.0.0.1:3000/items/:itemId (обновление элементов)
 //DELETE http://127.0.0.1:3000/items/:itemId (удаление элемента)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
