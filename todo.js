@@ -48,38 +48,22 @@ document.getElementById('add').onclick = function () {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //созраняем изменения состояния фильтра в filterStatus//////////////////////////////////////////////////////////////////
 document.getElementById('completed').addEventListener('click', function(){
-    if (document.getElementById('completed').checked){
-        filterStatus.isCompleted = true;
-    }else{
-        filterStatus.isCompleted = false;
-    }
+    filterStatus.isCompleted = (document.getElementById('completed').checked) ? true : false;
     reloadTasksFiltered();
     out();
 });
 document.getElementById('high').addEventListener('click', function(){
-    if (document.getElementById('high').checked){
-        filterStatus.isHigh = true;
-    }else{
-        filterStatus.isHigh = false;
-    }
+    filterStatus.isHigh = (document.getElementById('high').checked) ? true : false;
     reloadTasksFiltered();
     out();
 });
 document.getElementById('normal').addEventListener('click', function(){
-    if (document.getElementById('normal').checked){
-        filterStatus.isNormal = true;
-    }else{
-        filterStatus.isNormal = false;
-    }
+   filterStatus.isNormal = (document.getElementById('normal').checked) ? true : false;
     reloadTasksFiltered();
     out();
 });
 document.getElementById('low').addEventListener('click', function(){
-    if (document.getElementById('low').checked){
-        filterStatus.isLow = true;
-    }else{
-        filterStatus.isLow = false;
-    }
+    filterStatus.isLow = (document.getElementById('low').checked) ? true : false;
     reloadTasksFiltered();
     out();
 });
@@ -95,7 +79,7 @@ function reloadTasksFiltered(){
                 tasksFiltered.push(item);
             }else if(item.isCompleted && filterStatus.isLow && item.priority === 'low'){
                 tasksFiltered.push(item);
-            }else if (item.isCompleted && !(filterStatus.isHigh && filterStatus.isNormal && filterStatus.isLow)){
+            }else if (item.isCompleted && !(filterStatus.isHigh || filterStatus.isNormal || filterStatus.isLow)){
                 tasksFiltered.push(item);
             }
         }else{
@@ -143,26 +127,31 @@ function out(){
             });
 //кнопка OK/////////////////////////////////////////////////////////////////////////////////////////////////////////////
             buttonOK.addEventListener('click', function(){
-                tasks[item.id].isCompleted = true;
-                tasks[item.id].timeConfirm = new Date().toUTCString();
-                tasks[item.id].timeCancel = null;
-
+                tasks.forEach((tsk) => {
+                    if (tsk.id === item.id){
+                        tsk.isCompleted = true;
+                        tsk.timeConfirm = new Date().toUTCString();
+                        tsk.timeCancel = null;
+                    }
+                })
                 reloadTasksFiltered();
                 out();
             });
 //кнопка NO/////////////////////////////////////////////////////////////////////////////////////////////////////////////
             buttonNO.addEventListener('click', function(){
-                tasks[item.id].isCompleted = false;
-                tasks[item.id].timeConfirm = null;
-                tasks[item.id].timeCancel = new Date().toUTCString();
-
+                tasks.forEach((tsk) => {
+                    if (tsk.id === item.id){
+                        tsk.isCompleted = false;
+                        tsk.timeConfirm = null;
+                        tsk.timeCancel = new Date().toUTCString();
+                    }
+                })
                 reloadTasksFiltered();
                 out();
             });
 //кнопка DELETE/////////////////////////////////////////////////////////////////////////////////////////////////////////
             buttonDELETE.addEventListener('click', function(){
                 element.removeChild(outDiv);
-
                 tasks.forEach((param, i) => {
                     if (param.id === item.id) {
                         tasks.splice(i, 1);
@@ -200,7 +189,7 @@ document.getElementById('filterDate').addEventListener('click', function(){
     out();
 });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//обработчик события для сортировки по времени//////////////////////////////////////////////////////////////////////////
+//обработчик события нажатия на текст задачи////////////////////////////////////////////////////////////////////////////
 function onTaskTextClick(currentId, taskText) {
      let outDivById = document.getElementById(currentId);
      let textInput = document.createElement('input');
@@ -212,6 +201,7 @@ function onTaskTextClick(currentId, taskText) {
          let taskText = document.createElement('div');
          taskText.innerHTML = textInput.value;
          taskText.id = 'taskText' + currentId;
+         tasks[currentId].taskName = textInput.value;
          taskText.addEventListener('click', function () {
              onTaskTextClick(currentId, taskText)
          });
@@ -221,4 +211,57 @@ function onTaskTextClick(currentId, taskText) {
      outDivById.replaceChild(textInput, taskText);
      outDivById.appendChild(saveEdit);
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//сам пока что не понимаю, чего я хочу(GET)/////////////////////////////////////////////////////////////////////////////
+/*let xhr = new XMLHttpRequest();//создание запроса
+// 2. Настраиваем его: GET-запрос по URL
+xhr.open('GET', 'http://127.0.0.1:3000/items'); //GET http://127.0.0.1:3000/items
+// 3. Отсылаем запрос
+xhr.send();
+// 4. Этот код сработает после того, как мы получим ответ сервера
+xhr.onload = function() {
+    if (xhr.status != 200) { // анализируем HTTP-статус ответа, если статус не 200, то произошла ошибка
+        alert(`Ошибка ${xhr.status}: ${xhr.statusText}`); // Например, 404: Not Found
+    } else { // если всё прошло гладко, выводим результат
+        alert(`Готово, получили ${xhr.response.length} байт`); // response -- это ответ сервера
+        console.log(xhr.response);
+    }
+};
+xhr.onprogress = function(event) {
+    if (event.lengthComputable) {
+        alert(`Получено ${event.loaded} из ${event.total} байт`);
+    } else {
+        alert(`Получено ${event.loaded} байт`); // если в ответе нет заголовка Content-Length
+    }
+
+};
+xhr.onerror = function() {
+    alert("Запрос не удался");
+};*/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//сам пока что не понимаю, чего я хочу(POST)////////////////////////////////////////////////////////////////////////////
+/*
+function upload(file) {
+    let xhr = new XMLHttpRequest();
+
+    // отслеживаем процесс отправки
+    xhr.upload.onprogress = function(event) {
+        console.log(`Отправлено ${event.loaded} из ${event.total}`);
+    };
+
+    // Ждём завершения: неважно, успешного или нет
+    xhr.onloadend = function() {
+        if (xhr.status == 200) {
+            console.log("Успех");
+        } else {
+            console.log("Ошибка " + this.status);
+        }
+    };
+
+    xhr.open("POST", "item"); ////POST http://127.0.0.1:3000/items
+    xhr.send(file);
+}*/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//PUT http://127.0.0.1:3000/items/:itemId (обновления элементов)
+//DELETE http://127.0.0.1:3000/items/:itemId (удаление элемента)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
