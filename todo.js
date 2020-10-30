@@ -23,7 +23,7 @@ document.getElementById('add').onclick = function () {
         return;
     };
 
-    posttasks(
+    posttask(
         {
             taskName: document.getElementById('input').value,
             priority: document.getElementById('slt').value,
@@ -124,6 +124,9 @@ function out(){
                         tsk.timeCancel = null;
                     }
                 })
+
+                puttask(item.id);
+
                 reloadTasksFiltered();
                 out();
             });
@@ -136,17 +139,21 @@ function out(){
                         tsk.timeCancel = new Date().toUTCString();
                     }
                 })
+
+                puttask(item.id);
+
                 reloadTasksFiltered();
                 out();
             });
 //кнопка DELETE/////////////////////////////////////////////////////////////////////////////////////////////////////////
             buttonDELETE.addEventListener('click', function(){
-                element.removeChild(outDiv);
-                tasks.forEach((param, i) => {
+               element.removeChild(outDiv);
+                deletetask(item.id);
+                /*tasks.forEach((param, i) => {
                     if (param.id === item.id) {
                         tasks.splice(i, 1);
                     }
-                })
+                })*/
             });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             outDiv.innerHTML += item.priority + '(^_^) Create: ' + item.timeCreate;
@@ -201,6 +208,8 @@ function onTaskTextClick(currentId, taskText) {
             }
          });
 
+         puttask(currentId);
+
          taskText.addEventListener('click', function () {
              onTaskTextClick(currentId, taskText)
          });
@@ -212,7 +221,7 @@ function onTaskTextClick(currentId, taskText) {
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //(GET)/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function gettasks(taskid) {
+function gettasks() {
     let xhr = new XMLHttpRequest();
     xhr.open('GET', 'http://127.0.0.1:3000/items');
     xhr.setRequestHeader('Content-Type', 'application/json');
@@ -226,7 +235,7 @@ function gettasks(taskid) {
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //(POST)////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function posttasks(body) {
+function posttask(body) {
     let xhr = new XMLHttpRequest();
     xhr.open("POST", "http://127.0.0.1:3000/items");
     xhr.setRequestHeader('Content-Type', 'application/json');
@@ -239,6 +248,31 @@ function posttasks(body) {
     };
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//PUT///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //PUT http://127.0.0.1:3000/items/:itemId (обновление элементов)
-//DELETE http://127.0.0.1:3000/items/:itemId (удаление элемента)
+function puttask(taskid) {
+    let xhr = new XMLHttpRequest();
+    xhr.open('PUT', 'http://127.0.0.1:3000/items/:itemId');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    //xhr.send(JSON.stringify(taskid));
+    xhr.send(JSON.stringify(taskid));/////////////////////////
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//DELETE////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function deletetask(taskid) {
+    let xhr = new XMLHttpRequest();
+    xhr.open('DELETE', 'http://127.0.0.1:3000/items/:itemId');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    //xhr.send(JSON.stringify(taskid));
+    xhr.send(taskid);/////////////////////////
+
+    tasks.forEach((param, i) => {
+        if (param.id === taskid) {
+            tasks.splice(i, 1);
+        }
+    })
+
+    reloadTasksFiltered();
+    out();
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
