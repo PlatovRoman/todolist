@@ -125,7 +125,7 @@ function out(){
                     }
                 })
 
-                puttask(item.id);
+                puttask(item.id, item);
 
                 reloadTasksFiltered();
                 out();
@@ -140,7 +140,7 @@ function out(){
                     }
                 })
 
-                puttask(item.id);
+                puttask(item.id, item);
 
                 reloadTasksFiltered();
                 out();
@@ -149,11 +149,6 @@ function out(){
             buttonDELETE.addEventListener('click', function(){
                element.removeChild(outDiv);
                 deletetask(item.id);
-                /*tasks.forEach((param, i) => {
-                    if (param.id === item.id) {
-                        tasks.splice(i, 1);
-                    }
-                })*/
             });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             outDiv.innerHTML += item.priority + '(^_^) Create: ' + item.timeCreate;
@@ -205,10 +200,9 @@ function onTaskTextClick(currentId, taskText) {
          tasks.forEach((tsk) => {
              if (tsk.id === currentId){
                  tsk.taskName = textInput.value;
+                 puttask(currentId, tsk);
             }
          });
-
-         puttask(currentId);
 
          taskText.addEventListener('click', function () {
              onTaskTextClick(currentId, taskText)
@@ -250,21 +244,19 @@ function posttask(body) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //PUT///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //PUT http://127.0.0.1:3000/items/:itemId (обновление элементов)
-function puttask(taskid) {
+function puttask(taskid, task) {
     let xhr = new XMLHttpRequest();
-    xhr.open('PUT', 'http://127.0.0.1:3000/items/:itemId');
+    xhr.open('PUT', 'http://127.0.0.1:3000/items/' + String(taskid));
     xhr.setRequestHeader('Content-Type', 'application/json');
-    //xhr.send(JSON.stringify(taskid));
-    xhr.send(JSON.stringify(taskid));/////////////////////////
+    xhr.send(JSON.stringify(task));
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //DELETE////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function deletetask(taskid) {
     let xhr = new XMLHttpRequest();
-    xhr.open('DELETE', 'http://127.0.0.1:3000/items/:itemId');
+    xhr.open('DELETE', 'http://127.0.0.1:3000/items/' + String(taskid));
     xhr.setRequestHeader('Content-Type', 'application/json');
-    //xhr.send(JSON.stringify(taskid));
-    xhr.send(taskid);/////////////////////////
+    xhr.send();
 
     tasks.forEach((param, i) => {
         if (param.id === taskid) {
