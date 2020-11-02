@@ -23,11 +23,15 @@ document.getElementById('add').onclick = function () {
         return;
     };
 
+    let time = new Date().toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow' });
+    let date = new Date().toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow' });
+
     posttask(
         {
             taskName: document.getElementById('input').value,
             priority: document.getElementById('slt').value,
-            timeCreate: new Date().toUTCString(),
+            //timeCreate: new Date().toUTCString(),
+            timeCreate: 'Time: ' + time + '⌚ Date: ' + date,
             isCompleted: false,
             timeConfirm: null,
             timeCancel: null
@@ -104,6 +108,8 @@ function out(){
             let buttonNO = document.createElement('button');
             let buttonDELETE = document.createElement('button');
 
+            outDiv.classList.add("outD");
+            taskText.classList.add("taskText");
             buttonOK.classList.add("btnOK");
             buttonNO.classList.add("btnNO");
             buttonDELETE.classList.add("btnDELETE");
@@ -120,7 +126,10 @@ function out(){
                 tasks.forEach((tsk) => {
                     if (tsk.id === item.id){
                         tsk.isCompleted = true;
-                        tsk.timeConfirm = new Date().toUTCString();
+                        let time = new Date().toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow' });
+                        let date = new Date().toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow' });
+                        tsk.timeConfirm = 'Time: ' + time + '⌚ Date: ' + date;
+                        //tsk.timeConfirm = new Date().toUTCString();
                         tsk.timeCancel = null;
                     }
                 })
@@ -136,7 +145,10 @@ function out(){
                     if (tsk.id === item.id){
                         tsk.isCompleted = false;
                         tsk.timeConfirm = null;
-                        tsk.timeCancel = new Date().toUTCString();
+                        let time = new Date().toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow' });
+                        let date = new Date().toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow' });
+                        //tsk.timeCancel = new Date().toUTCString();
+                        tsk.timeCancel = 'Time: ' + time + '⌚ Date: ' + date;
                     }
                 })
 
@@ -151,16 +163,16 @@ function out(){
                 deletetask(item.id);
             });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            outDiv.innerHTML += item.priority + '(^_^) Create: ' + item.timeCreate;
+            outDiv.innerHTML += '👾' + item.priority + '👾 ' + item.timeCreate;
             taskText.innerHTML = item.taskName;
             taskText.id = 'taskText' + item.id;
 
             if (item.timeConfirm !== null) {
-                dateconfirm.innerHTML = 'Confirm: ' + item.timeConfirm;
+                dateconfirm.innerHTML = '(Confirm) ' + item.timeConfirm;
             }
 
             if (item.timeCancel !== null) {
-                datecancel.innerHTML = 'Cancel: ' + item.timeCancel;
+                datecancel.innerHTML = '(Cancel) ' + item.timeCancel;
             }
 
             outDiv.id = String(item.id);
@@ -186,16 +198,20 @@ function onTaskTextClick(currentId, taskText) {
      let outDivById = document.getElementById(currentId);
      let textInput = document.createElement('input');
 
+     textInput.classList.add("taskText");
+     outDivById.classList.add("taskText");
      textInput.value = taskText.innerHTML;
      textInput.id = 'taskText' + currentId;
 
      let saveEdit = document.createElement('button');
      saveEdit.innerHTML = 'Save Edit';
+     saveEdit.classList.add("btnDELETE");
      saveEdit.addEventListener('click', function () {
 
         let taskText = document.createElement('div');
         taskText.innerHTML = textInput.value;
         taskText.id = 'taskText' + currentId;
+        taskText.classList.add("taskText");
 
          tasks.forEach((tsk) => {
              if (tsk.id === currentId){
